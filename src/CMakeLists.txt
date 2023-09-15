@@ -1,0 +1,1 @@
+add_executable(myspice myspice.cpp argparse.cpp read_netlist.cpp help_message.cpp)

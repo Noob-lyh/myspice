@@ -1,5 +1,5 @@
-#ifndef __MYSPICE__
-#define __MYSPICE__
+#ifndef __MYSPICE_H__
+#define __MYSPICE_H__
 
 #include<stdio.h>
 
@@ -13,7 +13,7 @@
 
 
 // structures
-typedef struct mynetlist
+struct mynetlist
 {
     int nodes;
 };
@@ -21,11 +21,7 @@ typedef struct mynetlist
 
 
 // funtions
-void help_message()
-{
-    printf("Help message.\n");
-    return;
-}
+void help_message();
 
 int argparse(int, char**, int*, double*, char*);
 
