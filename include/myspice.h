@@ -1,7 +1,7 @@
 #ifndef __MYSPICE_H__
 #define __MYSPICE_H__
 
-#include<stdio.h>
+#include<iostream>
 #include<vector>
 #include<map>
 #include<string>
@@ -10,6 +10,8 @@ using std::vector;
 using std::map;
 using std::string;
 
+using std::cout;
+using std::endl;
 
 
 // ===================================== defines =====================================
@@ -41,7 +43,7 @@ private:
 class Device {
 public:
   Device(const string&);
-  virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
+  virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&) = 0;
   virtual ~Device();
   void setPnode(int);
   int pnode() const;
@@ -145,12 +147,6 @@ private:
   int _num_in;
   int _num_out;
 };
-
-struct mynetlist
-{
-    int nodes;
-};
-
 
 
 // ===================================== funtions def =====================================
