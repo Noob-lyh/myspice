@@ -10,17 +10,21 @@
 
 #include "myspice.h"
 
+
 /// \brief Constructor
 Device::Device(const string &name): _name(name),_pnode(0),_nnode(0),_value(0) {};
 
+
 /// \brief destructor
 Device::~Device() {};
+
 
 /// \brief Set the positive node number
 ///
 /// @param p node number
 ///
 void Device::setPnode(int p) {_pnode = p;}
+
 
 /// \brief Get the positive node number
 ///
@@ -29,11 +33,13 @@ void Device::setPnode(int p) {_pnode = p;}
 ///
 int Device::pnode() const {return _pnode;}
 
+
 /// \brief Set the negative node number
 ///
 /// @param p node number
 ///
 void Device::setNnode(int p) {_nnode = p;}
+
 
 /// \brief Get the negative node number
 ///
@@ -41,6 +47,7 @@ void Device::setNnode(int p) {_nnode = p;}
 /// @return negative node number of this device
 ///
 int Device::nnode() const {return _nnode;}  
+
 
 /// \brief Set the value of this device
 ///
@@ -50,6 +57,7 @@ int Device::nnode() const {return _nnode;}
 /// and etc. Store what you want. 
 void Device::setValue(double d) {_value = d;}
 
+
 /// \brief Get the value of this device
 ///
 ///
@@ -57,11 +65,13 @@ void Device::setValue(double d) {_value = d;}
 ///
 double Device::value() const {return _value;}
 
+
 /// \brief Set the name of this device
 ///
 /// @param n device name
 ///
 void Device::setName(const string& n) {_name = n;}
+
 
 /// \brief Get the name of this device
 ///

@@ -22,6 +22,7 @@ using std::endl;
 #define MYSPICE_ARGUMENT_ERROR      (-1)
 #define MYSPICE_FILE_CANNOT_OPEN    (-2)
 #define MYSPICE_FILE_FORMAT_ERROR   (-3)
+#define MYSPICE_NO_INPUT_FILE       (-4)
 
 
 
@@ -43,7 +44,6 @@ private:
 class Device {
 public:
   Device(const string&);
-  virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&) = 0;
   virtual ~Device();
   void setPnode(int);
   int pnode() const;
@@ -53,6 +53,7 @@ public:
   double value() const;
   void setName(const string&);
   string name() const;
+  virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&) = 0;
 protected:
   string _name;
   int _pnode;
@@ -81,9 +82,9 @@ class Inductor: public Device{
 public:
   Inductor(const string&);
   virtual ~Inductor();
-  virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
   int auxNode() const;
   void setAux(int);
+  virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
 private:
   int _aux_node;
 };
@@ -96,22 +97,23 @@ public:
   virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
 };
 
+
 class Vsrc: public Device{
 public:
   Vsrc(const string&);
   virtual ~Vsrc();
-  virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
   int auxNode() const;
   void setAux(int);
+  virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
 private:
   int _aux_node;
 };
+
 
 class Mutual: public Device{
 public:
   Mutual(const string&);
   virtual ~Mutual();
-  virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
   int auxPosNode() const;
   void setAuxPos(int);
   int auxNegNode() const;
@@ -120,12 +122,14 @@ public:
   void setInd1(const string&);
   string ind2() const;
   void setInd2(const string&);
+  virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
 private:
   int _aux_node_pos;
   int _aux_node_neg;
   string _ind1;
   string _ind2;
 };
+
 
 class Stamp{
 public:
@@ -134,7 +138,7 @@ public:
   Stamp();
   ~Stamp();
   void parse(char*);
-  void output(char*);
+  void output(const char*);
   void setup();
 private:
   devList _dev_list;

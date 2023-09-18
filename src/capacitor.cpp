@@ -1,5 +1,5 @@
 ///
-/// @file   cap.cpp
+/// @file   capacitor.cpp
 /// @author Yinghai
 /// @date   Fri Sep 12 14:25:35 2008
 /// 
@@ -10,12 +10,15 @@
 
 #include "myspice.h"
 
+
 /// \brief Constructor
 /// \param name name of the capacitor
 Capacitor::Capacitor(const string& name):Device(name) {};
 
+
 /// \brief Destructor
 Capacitor::~Capacitor() {};
+
 
 /// \brief stamping function of the capacitor
 ///
@@ -31,5 +34,3 @@ void Capacitor::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B)
 
   cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
 }
-
-

@@ -8,10 +8,29 @@
 /// 
 ///
 
-#include "isrc.h"
+#include "myspice.h"
 
-void Isrc::stamp(Matrix& C, Matrix& G, Matrix& B)
+
+/// \brief Constructor
+/// \param name name of the current source
+Isrc::Isrc(const string &name) : Device(name) {};
+
+
+/// \brief Destructor
+Isrc::~Isrc() {};
+
+
+/// \brief stamping function of the current source
+///
+/// @param C system matrix \f$ C \f$
+/// @param G system matrix \f$ G \f$
+/// @param B system matrix \f$ B \f$
+///
+/// \todo You have to fills in each stamp function. 
+///
+void Isrc::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B)
 {
-  // to be implemented
-  cout<<_name<<' '<<_pnode<<' '<<_nnode<<' '<<_value<<endl;
+  
+
+  cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
 }

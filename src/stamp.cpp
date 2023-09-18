@@ -8,16 +8,7 @@
 /// 
 ///
 
-
-
-#include "stamp.h"
-#include "cap.h"
-#include "res.h"
-#include "isrc.h"
-#include "vsrc.h"
-#include "mut.h"
-#include "ind.h"
-#include "util.h"
+#include "myspice.h"
 #include <fstream>
 #include <sstream>
 
@@ -53,15 +44,14 @@ using std::getline;
 /// Please consider how to support this. 
 /// 
 void Stamp::setup(){
-  int n = static_cast<int>(_node_list.size()) - 1;
-  _C = new Matrix(n,n);
-  _G = new Matrix(n,n);
-  _B = new Matrix(n, _num_in);
-  _LT = new Matrix(_num_out, n);
-  
-  for(size_t i=0; i < _dev_list.size(); ++i){
-    _dev_list[i]->stamp(*_C,*_G, *_B);
-  }
+	int n = static_cast<int>(_node_list.size()) - 1;
+	_C = new Mat<REAL>(n,n);
+	_G = new Mat<REAL>(n,n);
+	_B = new Mat<REAL>(n, _num_in);
+	_LT = new Mat<REAL>(_num_out, n);
+	for(size_t i=0; i < _dev_list.size(); ++i){
+		_dev_list[i]->stamp(*_C, *_G, *_B);
+	}
 }
 
 
@@ -74,7 +64,7 @@ void Stamp::setup(){
 /// matrix structure is preferred over the dense one. 
 /// 
 /// \todo Please fill in this function. 
-void Stamp::output(char* filename)
+void Stamp::output(const char* filename)
 {
   
 }
@@ -97,219 +87,236 @@ void Stamp::output(char* filename)
 /// subcircuit or controlled sources. 
 void Stamp::parse(char* filename)
 {
-  ifstream ifid(filename);
-  _num_in = 0;
-  _num_out = 0;
+	ifstream ifid(filename);
+	_num_in = 0;
+	_num_out = 0;
 	
-  string line;
-  string delims(" \n\r()\t");
-  int k = 0;
-  _node_list["0"] = 0;
+	string line;
+	string delims(" \n\r()\t");
+	int k = 0;
+	_node_list["0"] = 0;
 
-  while(getline(ifid, line))
-    {
-      string tmp;
-      capitalize(line);
-      if(line[0] == 'R'){
-	// name
-	tmp = tokenizer(line, delims);
-	Resistor* r = new Resistor(tmp);
+	while(getline(ifid, line))
+	{
+		string tmp;
+		capitalize(line);
 
-	// pnode
-	tmp = tokenizer(line, delims);
-	if(_node_list.find(tmp) == _node_list.end())
-	  {
-	    _node_list[tmp] = ++k;
-	  }
-	r->setPnode(_node_list[tmp]);
+		if(line[0] == 'R'){
 
-	// nnode
-	tmp = tokenizer(line, delims);
-	if(_node_list.find(tmp) == _node_list.end())
-	  {
-	    _node_list[tmp] = ++k;
-	  }
-	r->setNnode(_node_list[tmp]);
+			// name
+			tmp = tokenizer(line, delims);
+			Resistor *r = new Resistor(tmp);
 
-	// value
-	tmp = tokenizer(line, delims);
-	r->setValue(to_double(tmp));
+			// pnode
+			tmp = tokenizer(line, delims);
+			if(_node_list.find(tmp) == _node_list.end())
+	  		{
+	    		_node_list[tmp] = ++k;
+	  		}
+			r->setPnode(_node_list[tmp]);
 
-	// add to device list
-	_dev_list.push_back(r);
-      }
-      else if(line[0] == 'C'){
-	// name
-	tmp = tokenizer(line, delims);
-	Capacitor* r = new Capacitor(tmp);
+			// nnode
+			tmp = tokenizer(line, delims);
+			if(_node_list.find(tmp) == _node_list.end())
+	  		{
+	    		_node_list[tmp] = ++k;
+	  		}
+			r->setNnode(_node_list[tmp]);
 
-	// pnode
-	tmp = tokenizer(line, delims);
-	if(_node_list.find(tmp) == _node_list.end())
-	  {
-	    _node_list[tmp] = ++k;
-	  }
-	r->setPnode(_node_list[tmp]);
+			// value
+			tmp = tokenizer(line, delims);
+			r->setValue(to_double(tmp));
 
-	// nnode
-	tmp = tokenizer(line, delims);
-	if(_node_list.find(tmp) == _node_list.end())
-	  {
-	    _node_list[tmp] = ++k;
-	  }
-	r->setNnode(_node_list[tmp]);
-
-	// value
-	tmp = tokenizer(line, delims);
-	r->setValue(to_double(tmp));
-
-	// add to device list
-	_dev_list.push_back(r);
-      }
-      else if(line[0] == 'I'){
-	// name
-	tmp = tokenizer(line, delims);
-	Isrc* r = new Isrc(tmp);
-
-	// pnode
-	tmp = tokenizer(line, delims);
-	if(_node_list.find(tmp) == _node_list.end())
-	  {
-	    _node_list[tmp] = ++k;
-	  }
-	r->setPnode(_node_list[tmp]);
-
-	// nnode
-	tmp = tokenizer(line, delims);
-	if(_node_list.find(tmp) == _node_list.end())
-	  {
-	    _node_list[tmp] = ++k;
-	  }
-	r->setNnode(_node_list[tmp]);
-
-	// value
-	tmp = tokenizer(line, delims);
-	r->setValue(to_double(tmp));
-
-	// add to device list
-	_dev_list.push_back(r);
-	++_num_in;
-      }
-      else if(line[0] == 'V'){
-	// name
-	tmp = tokenizer(line, delims);
-	Vsrc* r = new Vsrc(tmp);
+			// add to device list
+			_dev_list.push_back(r);
+      	}
+      
+	  	else if(line[0] == 'C'){
 			
-	// aux current
-	tmp = "i:"+tmp;
-	if(_node_list.find(tmp) == _node_list.end())
-	  {
-	    _node_list[tmp] = ++k;
-	  }
-	r->setAux(_node_list[tmp]);
+			// name
+			tmp = tokenizer(line, delims);
+			Capacitor* r = new Capacitor(tmp);
 
-	// pnode
-	tmp = tokenizer(line, delims);
-	if(_node_list.find(tmp) == _node_list.end())
-	  {
-	    _node_list[tmp] = ++k;
-	  }
-	r->setPnode(_node_list[tmp]);
+			// pnode
+			tmp = tokenizer(line, delims);
+			if(_node_list.find(tmp) == _node_list.end())
+	  		{
+	    		_node_list[tmp] = ++k;
+	  		}
+			r->setPnode(_node_list[tmp]);
 
-	// nnode
-	tmp = tokenizer(line, delims);
-	if(_node_list.find(tmp) == _node_list.end())
-	  {
-	    _node_list[tmp] = ++k;
-	  }
-	r->setNnode(_node_list[tmp]);
+			// nnode
+			tmp = tokenizer(line, delims);
+			if(_node_list.find(tmp) == _node_list.end())
+	  		{
+	    		_node_list[tmp] = ++k;
+	  		}
+			r->setNnode(_node_list[tmp]);
+
+			// value
+			tmp = tokenizer(line, delims);
+			r->setValue(to_double(tmp));
+
+			// add to device list
+			_dev_list.push_back(r);
+      	}
+      
+		else if(line[0] == 'I'){
 			
-	// value
-	tmp = tokenizer(line, delims);
-	r->setValue(to_double(tmp));
+			// name
+			tmp = tokenizer(line, delims);
+			Isrc* r = new Isrc(tmp);
 
-	// add to device list
-	_dev_list.push_back(r);
-	++_num_out;
-      }
-      else if(line[0] == 'L'){
-	// name
-	tmp = tokenizer(line, delims);
-	Inductor* r = new Inductor(tmp);
+			// pnode
+			tmp = tokenizer(line, delims);
+			if(_node_list.find(tmp) == _node_list.end())
+	  		{
+	   			_node_list[tmp] = ++k;
+	  		}
+			r->setPnode(_node_list[tmp]);
+
+			// nnode
+			tmp = tokenizer(line, delims);
+			if(_node_list.find(tmp) == _node_list.end())
+	  		{
+	    		_node_list[tmp] = ++k;
+	  		}
+			r->setNnode(_node_list[tmp]);
+
+			// value
+			tmp = tokenizer(line, delims);
+			r->setValue(to_double(tmp));
+
+			// add to device list
+			_dev_list.push_back(r);
+			++_num_in;
+      	}
+
+      	else if(line[0] == 'V'){
 			
-	// aux current
-	tmp = "i:"+tmp;
-	if(_node_list.find(tmp) == _node_list.end())
-	  {
-	    _node_list[tmp] = ++k;
-	  }
-	r->setAux(_node_list[tmp]);
-
-	// pnode
-	tmp = tokenizer(line, delims);
-	if(_node_list.find(tmp) == _node_list.end())
-	  {
-	    _node_list[tmp] = ++k;
-	  }
-	r->setPnode(_node_list[tmp]);
-
-	// nnode
-	tmp = tokenizer(line, delims);
-	if(_node_list.find(tmp) == _node_list.end())
-	  {
-	    _node_list[tmp] = ++k;
-	  }
-	r->setNnode(_node_list[tmp]);
+			// name
+			tmp = tokenizer(line, delims);
+			Vsrc* r = new Vsrc(tmp);
 			
-	// value
-	tmp = tokenizer(line, delims);
-	r->setValue(to_double(tmp));
+			// aux current
+			tmp = "i:"+tmp;
+			if(_node_list.find(tmp) == _node_list.end())
+	  		{
+	    		_node_list[tmp] = ++k;
+	  		}
+			r->setAux(_node_list[tmp]);
 
-	// add to device list
-	_dev_list.push_back(r);
-      }
-      else if(line[0] == 'K'){
-	// name
-	tmp = tokenizer(line, delims);
-	Mutual* r = new Mutual(tmp);
+			// pnode
+			tmp = tokenizer(line, delims);
+			if(_node_list.find(tmp) == _node_list.end())
+	  		{
+	    		_node_list[tmp] = ++k;
+	  		}
+			r->setPnode(_node_list[tmp]);
+
+			// nnode
+			tmp = tokenizer(line, delims);
+			if(_node_list.find(tmp) == _node_list.end())
+	  		{
+	    		_node_list[tmp] = ++k;
+	  		}
+			r->setNnode(_node_list[tmp]);
 			
-	// pnode
-	tmp = tokenizer(line, delims);
-	r->setInd1(tmp);
+			// value
+			tmp = tokenizer(line, delims);
+			r->setValue(to_double(tmp));
 
-	// nnode
-	tmp = tokenizer(line, delims);
-	r->setInd2(tmp);
+			// add to device list
+			_dev_list.push_back(r);
+			++_num_out;
+      	}
+    
+		else if(line[0] == 'L'){
+	
+			// name
+			tmp = tokenizer(line, delims);
+			Inductor* r = new Inductor(tmp);
 			
-	// value
-	tmp = tokenizer(line, delims);
-	r->setValue(to_double(tmp));
+			// aux current
+			tmp = "i:"+tmp;
+			if(_node_list.find(tmp) == _node_list.end())
+	  		{
+	    		_node_list[tmp] = ++k;
+	  		}
+			r->setAux(_node_list[tmp]);
 
-	// add to device list
-	_dev_list.push_back(r);
-      }
-      else {
-	string token = tokenizer(line, delims);
-	// netlist file ends
-	if (token == ".END") {
-	  return;
-	}
-	// specify output node
-	else if (token == ".PROBE" /*|| token == ".PRINT"*/) {
-	  token = tokenizer(line, delims);
-	  while(!token.empty()){
-	    if(token == "V")
-	      {
-		token = tokenizer(line, delims);
-		continue;
-	      }
-	    _probe_list.push_back(_node_list[token]);
-	    ++_num_out;
-	    token = tokenizer(line, delims);
-	  }
-	}
-      }
+			// pnode
+			tmp = tokenizer(line, delims);
+			if(_node_list.find(tmp) == _node_list.end())
+	  		{
+	    		_node_list[tmp] = ++k;
+	  		}
+			r->setPnode(_node_list[tmp]);
+
+			// nnode
+			tmp = tokenizer(line, delims);
+			if(_node_list.find(tmp) == _node_list.end())
+	  		{
+	    		_node_list[tmp] = ++k;
+	  		}
+			r->setNnode(_node_list[tmp]);
+			
+			// value
+			tmp = tokenizer(line, delims);
+			r->setValue(to_double(tmp));
+
+			// add to device list
+			_dev_list.push_back(r);
+      	}
+    
+		else if(line[0] == 'K'){
+			
+			// name
+			tmp = tokenizer(line, delims);
+			Mutual* r = new Mutual(tmp);
+			
+			// pnode
+			tmp = tokenizer(line, delims);
+			r->setInd1(tmp);
+
+			// nnode
+			tmp = tokenizer(line, delims);
+			r->setInd2(tmp);
+			
+			// value
+			tmp = tokenizer(line, delims);
+			r->setValue(to_double(tmp));
+
+			// add to device list
+			_dev_list.push_back(r);
+      	}
+      
+	  	else {
+			
+			string token = tokenizer(line, delims);
+	
+			// netlist file ends
+			if (token == ".END") {
+	  			return;
+			}
+	
+			// specify output node
+			else if (token == ".PROBE" /*|| token == ".PRINT"*/) {
+	  			token = tokenizer(line, delims);
+	  			while(!token.empty()){
+	    			if(token == "V")
+	      			{
+						token = tokenizer(line, delims);
+						continue;
+	      			}
+	    			_probe_list.push_back(_node_list[token]);
+	    			++_num_out;
+	    			token = tokenizer(line, delims);
+	  			}
+			}
+      	}
+
     } // end while
 
-  ifid.close();
+  	ifid.close();
 }

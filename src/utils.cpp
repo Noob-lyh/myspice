@@ -1,5 +1,5 @@
 ///
-/// @file   util.cpp
+/// @file   utils.cpp
 /// @author Yinghai
 /// @date   Fri Sep 12 14:05:16 2008
 /// 
@@ -8,30 +8,24 @@
 /// 
 ///
 
-#include "util.h"
+#include "myspice.h"
 
-string tokenizer(string& line, const string& delims){
+
+string tokenizer(string &line, const string &delims){
 	string toke;
-
-	// find the beginning position of first token
 	string::size_type idx_begin = line.find_first_not_of(delims);
-
 	if (idx_begin != string::npos) {
 		string::size_type idx_end = line.find_first_of(delims, idx_begin);
-
-		// last word
 		if (idx_end == string::npos) {
 			idx_end = line.length();
 		}
-
-		// extract the first token and erase it from the input string
 		toke = line.substr(idx_begin, idx_end - idx_begin);
 		capitalize(toke);
 		line.erase(0, idx_end - 0);
-	} // end if
-
+	}
 	return toke;
 }
+
 
 void capitalize(string &token) {
   for (size_t i = 0; i< token.length(); ++i) {
@@ -72,5 +66,4 @@ double to_double(string &str) {
 		else {}
 		return fig*scale;
 	}	
-
 }
