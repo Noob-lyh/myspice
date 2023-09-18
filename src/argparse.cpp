@@ -1,6 +1,14 @@
 #include"myspice.h"
 #include"string.h"
 
+void help_message(){
+
+    printf("help_message.\n");
+
+    return;
+
+};
+
 int argparse(int argc, char** argv, int* iparm, double* dparm, char* netlist_name){
 
     if (argc < 3)

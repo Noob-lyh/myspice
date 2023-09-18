@@ -12,9 +12,5 @@ int main(int argc, char** argv){
     char *netlist_name = NULL;
     myspice_stat = argparse(argc, argv, iparm, dparm, netlist_name);
 
-    mynetlist net;
-    myspice_stat = read_netlist(netlist_name, net);
-
-
     return myspice_stat;
 }
