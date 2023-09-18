@@ -18,6 +18,21 @@ using std::endl;
 using std::getline;
 
 
+/// \brief Constructor 
+Stamp::Stamp() : _C(NULL), _G(NULL), _B(NULL), _LT(NULL) {};
+
+
+/// \brief Destructor
+///
+/// It destroys the system matrix and release the allocated memory
+Stamp::~Stamp(){
+	if(_C) delete _C;
+	if(_G) delete _G;
+	if(_B) delete _B;
+	if(_LT) delete _LT;
+}
+
+
 /// \brief Initialize the system matrix and carry out the stamping
 ///
 /// This function is most important one because it setups up the liear system
@@ -66,7 +81,27 @@ void Stamp::setup(){
 /// \todo Please fill in this function. 
 void Stamp::output(const char* filename)
 {
-  
+	FILE* output = fopen(filename, "w");
+	//FILE* output = fopen(filename, "wb");
+
+	// C
+
+	// L
+
+	// G
+
+	// E
+
+	// B
+
+	// LT
+
+	// vector X
+
+	// vector Y
+
+	// vector U
+
 }
 
 

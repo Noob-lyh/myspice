@@ -36,9 +36,7 @@
 ///
 /// \todo Allocate the memory with given size of the matrix
 template<class T>
-Mat<T>::Mat(int nrow, int ncol) : _row(nrow), _col(ncol) {
-    
-}
+Mat<T>::Mat(int nrow, int ncol) : _row(nrow), _col(ncol), _nnz(0), _row_pointer(NULL), _col_index(NULL), _csr_value(NULL) {}
 
 
 /// \brief Destructor
@@ -46,17 +44,18 @@ Mat<T>::Mat(int nrow, int ncol) : _row(nrow), _col(ncol) {
 /// \todo release the allocated memory
 template<class T>
 Mat<T>::~Mat(){
-    
+    if (_row_pointer) delete _row_pointer;
+    if (_col_index) delete _col_index;
+    if (_csr_value) delete _csr_value;
 }
-  
 
-/// \brief return #rows
-/// \return #rowstemplate<class T>
+/// \brief insert nonezeros
 template<class T>
-int Mat<T>::row() const {return _row;}
+void Mat<T>::insert(int _row, int _col, REAL _value){
+    if( _row == 0 || _col == 0 )
+        return;
+    
+};
 
-
-/// \brief return #columns
-/// \return #columns
-template<class T>
-int Mat<T>::column() const {return _col;}
+template class Mat<double>;
+template class Mat<float>;

@@ -30,7 +30,9 @@ Resistor::~Resistor() {};
 /// 
 void Resistor::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B)
 {
-  
-
-  cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
+    G.insert(_pnode, _pnode, 1/_value);
+    G.insert(_nnode, _nnode, 1/_value);
+    G.insert(_pnode, _nnode, -1/_value);
+    G.insert(_nnode, _pnode, -1/_value);
+    cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
 }
