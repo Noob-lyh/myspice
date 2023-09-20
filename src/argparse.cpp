@@ -10,14 +10,14 @@ void help_message(){
 
 };
 
-int argparse(int argc, char** argv, int* iparm, double* dparm, char* input_file){
+int argparse(int argc, char** argv, int* iparm, double* dparm, char** input_file){
 
     for (int i = 1; i < argc;) {
 
         if (strcmp(argv[i], "-f") == 0) {
             if(i+1 > argc)
                 return MYSPICE_ARGUMENT_ERROR;
-            input_file = argv[i+1];
+            *input_file = argv[i+1];
             i += 2;
         }
 
@@ -30,8 +30,12 @@ int argparse(int argc, char** argv, int* iparm, double* dparm, char* input_file)
 
         else if (strcmp(argv[i], "-h") == 0) {
            help_message();
-           ++i;
+           i++;
         } 
+
+        else {
+            return MYSPICE_ARGUMENT_ERROR;
+        }
 
     }
 

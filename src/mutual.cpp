@@ -70,7 +70,7 @@ void Mutual::setInd2(const string& l) {_ind2=l;}
 /// 
 void Mutual::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B)
 {
-  
-
-  cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
+    C.insert(_aux_node_pos, _aux_node_neg, -_value);
+    C.insert(_aux_node_neg, _aux_node_pos, -_value);
+    cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
 }

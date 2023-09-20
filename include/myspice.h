@@ -29,17 +29,27 @@ using std::endl;
 
 // ===================================== class def =====================================
 
+
 template<class T>
 class Mat{
 public:
 	Mat(int, int);
 	~Mat();
-	int _row, _col, _nnz;
-	int *_row_pointer, *_col_index;
-	REAL *_csr_value;
 	void insert(int, int, REAL);
+	void csr();
+    void print_csr(FILE*, int);
 private:
-	
+	// basic
+	int _row, _col;
+	// CSR
+	int _nnz;
+	int *_row_pointer;
+	vector<int> _col_index;
+	vector<REAL> _csr_value;
+	// tmp
+	int **_tmp_index;
+	T **_tmp_value;
+	int *_tmp_len, *_tmp_size;
 };
 
 
@@ -159,7 +169,7 @@ private:
 
 // argparse.cpp
 void help_message();
-int argparse(int, char**, int*, double*, char*);
+int argparse(int, char**, int*, double*, char**);
 
 // utils.cpp
 string tokenizer(string&, const string&);

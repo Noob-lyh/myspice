@@ -44,6 +44,27 @@
                 "isDefault": true
             },
             "detail": "调试器生成的任务。"
-        }
+        },
+
+        // run
+        {
+            "type": "process",
+            "label": "myspice-run",
+            "command": "${workspaceFolder}\\bin\\myspice.exe",
+            "args": [
+                "-f",
+                "./benchmark/spicets.sp",
+            ]
+        },
+
+        // run-help
+        {
+            "type": "process",
+            "label": "myspice-help_message",
+            "command": "${workspaceFolder}\\bin\\myspice.exe",
+            "args": [
+                "-h",
+            ],
+        },
     ]
 }

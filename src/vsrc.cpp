@@ -43,7 +43,10 @@ void Vsrc::setAux(int s) {_aux_node = s;}
 ///
 void Vsrc::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B)
 {
-  
-
-  cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
+    G.insert(_pnode, _aux_node, 1);
+    G.insert(_nnode, _aux_node, -1);
+    G.insert(_aux_node, _pnode, -1);
+    G.insert(_aux_node, _nnode, 1);
+    //B.insert(_aux_node, ??, );
+    cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
 }

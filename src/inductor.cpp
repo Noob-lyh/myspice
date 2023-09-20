@@ -45,7 +45,10 @@ void Inductor::setAux(int s) {_aux_node = s;}
 /// 
 void Inductor::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B)
 {
-  
-
-  cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
+	C.insert(_aux_node, _aux_node, _value);
+    G.insert(_nnode, _aux_node, 1);
+    G.insert(_pnode, _aux_node, -1);
+    G.insert(_aux_node, _nnode, -1);
+    G.insert(_aux_node, _pnode, 1);
+	cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
 }

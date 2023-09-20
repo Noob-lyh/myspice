@@ -30,7 +30,9 @@ Capacitor::~Capacitor() {};
 /// 
 void Capacitor::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B)
 {
-  
-
-  cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
+	C.insert(_pnode, _pnode, _value);
+    C.insert(_pnode, _nnode, -_value);
+    C.insert(_nnode, _pnode, -_value);
+    C.insert(_nnode, _nnode, _value);
+	cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
 }

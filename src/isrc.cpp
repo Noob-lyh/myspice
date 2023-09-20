@@ -30,7 +30,6 @@ Isrc::~Isrc() {};
 ///
 void Isrc::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B)
 {
-  
-
-  cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
+    G.insert(_pnode, _)
+    cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
 }

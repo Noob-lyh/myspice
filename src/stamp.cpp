@@ -60,13 +60,17 @@ Stamp::~Stamp(){
 /// 
 void Stamp::setup(){
 	int n = static_cast<int>(_node_list.size()) - 1;
-	_C = new Mat<REAL>(n,n);
-	_G = new Mat<REAL>(n,n);
+	_C = new Mat<REAL>(n,n);	// diag([C L])
+	_G = new Mat<REAL>(n,n);	// [G, E; -E^T, O]
 	_B = new Mat<REAL>(n, _num_in);
 	_LT = new Mat<REAL>(_num_out, n);
 	for(size_t i=0; i < _dev_list.size(); ++i){
 		_dev_list[i]->stamp(*_C, *_G, *_B);
 	}
+	_C->csr();
+	_G->csr();
+	_B->csr();
+	_LT->csr();
 }
 
 
@@ -81,27 +85,25 @@ void Stamp::setup(){
 /// \todo Please fill in this function. 
 void Stamp::output(const char* filename)
 {
-	FILE* output = fopen(filename, "w");
-	//FILE* output = fopen(filename, "wb");
+	int output_setting = 0; // 0-text, 1-binary, 2-command, others-nothing
+	
+	FILE* output = NULL;
 
-	// C
+	if (output_setting == 0)
+		output = fopen(filename, "w");
+	else if (output_setting == 1)
+		output = fopen(filename, "wb");
 
-	// L
-
-	// G
-
-	// E
-
-	// B
-
-	// LT
-
+	_C->print_csr(output, output_setting);
+	_G->print_csr(output, output_setting);
+	_B->print_csr(output, output_setting);
+	_LT->print_csr(output, output_setting);
 	// vector X
-
 	// vector Y
-
 	// vector U
 
+	fclose(output);
+	
 }
 
 

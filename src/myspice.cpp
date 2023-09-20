@@ -14,23 +14,27 @@ int main(int argc, char** argv){
     Stamp s;
 
     // default setting
-    iparm[0] = 0;           // phase: 0-nothing, 1-stamp
+    iparm[0] = 1;           // phase: 0-nothing, 1-stamp
 
     // argparse
-    myspice_stat = argparse(argc, argv, iparm, dparm, input_file);
+    myspice_stat = argparse(argc, argv, iparm, dparm, &input_file);
     CHECK_STAT(myspice_stat);
-    int i;
-    for(i = strlen(input_file)-1; i > 0 && input_file[i] != '.'; --i);
-    input_file_prefix = string(input_file, i);
+    printf("input file = %s\n", input_file);
+    int i; for(i = strlen(input_file)-1; i > 0 && input_file[i] != '.'; --i); input_file_prefix = string(input_file, i);
 
     // works
     if(iparm[0] == 1){
-        s.parse(input_file);    // A.sp -> class member
-        s.setup();              // class member -> matrix
+        printf("stamping...\n");
+        printf("  parsing netlist...\n");
+        s.parse(input_file);
+        printf("  setting up matrixes...\n");
+        s.setup();
+        printf("  writing result...\n");
         string output_file = input_file_prefix + ".out";
-        s.output(output_file.c_str());      // matrix -> output file
+        s.output(output_file.c_str());
     }
 
 RET:
+    printf("return code = %d\n", myspice_stat);
     return myspice_stat;
 }
