@@ -80,13 +80,11 @@ Mat<T>::~Mat(){
 
 /// \brief insert nonezeros
 template<class T>
-void Mat<T>::insert(int row, int col, REAL value){
+void Mat<T>::insert(int row, int col, REAL value){  // 0-based
 
-    // connect with node 0, or wrong input
-    if( row <= 0 || row > _row || col <= 0 || col > _col )
+    // wrong input
+    if( row < 0 || row >= _row || col < 0 || col >= _col )
         return;
-
-    --row; --col;   // convert to 0-based
 
     // too long for this row, reallocate memory
     if( _tmp_len[row] == _tmp_size[row] ){

@@ -29,7 +29,7 @@ using std::endl;
 
 // ===================================== class def =====================================
 
-
+// matrix.cpp
 template<class T>
 class Mat{
 public:
@@ -53,6 +53,7 @@ private:
 };
 
 
+// devices.cpp
 class Device {
 public:
     Device(const string&);
@@ -65,7 +66,7 @@ public:
     double value() const;
     void setName(const string&);
     string name() const;
-    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&) = 0;
+    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, vector<string*>&, vector<string*>&, vector<string*>&, int) = 0;
 protected:
     string _name;
     int _pnode;
@@ -73,22 +74,19 @@ protected:
     double _value;
 };
 
-
 class Resistor: public Device{
 public:
     Resistor(const string&);
     virtual ~Resistor();
-    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
+    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, vector<string*>&, vector<string*>&, vector<string*>&, int);
 };
-
 
 class Capacitor: public Device{
 public:
     Capacitor(const string&);
     virtual ~Capacitor();
-    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
+    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, vector<string*>&, vector<string*>&, vector<string*>&, int);
 };
-
 
 class Inductor: public Device{
 public:
@@ -96,19 +94,21 @@ public:
     virtual ~Inductor();
     int auxNode() const;
     void setAux(int);
-    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
+    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, vector<string*>&, vector<string*>&, vector<string*>&, int);
 private:
     int _aux_node;
 };
-
 
 class Isrc: public Device{
 public:
     Isrc(const string&);
     virtual ~Isrc();
-    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
+    int inIdx() const;
+    void setIn(int);
+    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, Mat<REAL>&,vector<string*>&, vector<string*>&, vector<string*>&, int);
+private:
+    int _in_index;
 };
-
 
 class Vsrc: public Device{
 public:
@@ -116,11 +116,12 @@ public:
     virtual ~Vsrc();
     int auxNode() const;
     void setAux(int);
-    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
-private:
+    int inIdx() const;
+    void setIn(int);
+    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, vector<string*>&, vector<string*>&, vector<string*>&, int);
     int _aux_node;
+    int _in_index;
 };
-
 
 class Mutual: public Device{
 public:
@@ -134,7 +135,7 @@ public:
     void setInd1(const string&);
     string ind2() const;
     void setInd2(const string&);
-    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&);
+    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, vector<string*>&, vector<string*>&, vector<string*>&, int);
 private:
     int _aux_node_pos;
     int _aux_node_neg;
@@ -143,25 +144,24 @@ private:
 };
 
 
+// stamp.cpp
 class Stamp{
 public:
-    typedef vector<Device*> devList;
-    typedef map<std::string, int> nodeList;
     Stamp();
     ~Stamp();
     void parse(char*);
     void output(const char*);
     void setup();
 private:
-    devList _dev_list;
-    nodeList _node_list;
-    vector<int> _probe_list;
-    Mat<REAL>* _C;
-    Mat<REAL>* _G;
-    Mat<REAL>* _B;
-    Mat<REAL>* _LT;
+    // for parse
     int _num_in;
     int _num_out;
+    map<string, int> _node_list, _aux_node_list;    // -> vector X
+    vector<Device*> _dev_list;
+    vector<string*> *_Y;    // = _probe_list
+    // for stamp
+    Mat<REAL> *_C, *_G, *_B, *_LT;
+    vector<string*> *_X, *_U;
 };
 
 
