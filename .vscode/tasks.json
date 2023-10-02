@@ -46,10 +46,10 @@
             "detail": "调试器生成的任务。"
         },
 
-        // run
+        // test 
         {
             "type": "process",
-            "label": "myspice-run",
+            "label": "myspice-test-spicets.sp",
             "command": "${workspaceFolder}\\bin\\myspice.exe",
             "args": [
                 "-f",
@@ -57,7 +57,18 @@
             ]
         },
 
-        // run-help
+        // test for subckt
+        {
+            "type": "process",
+            "label": "myspice-test-RLC_s3.sp",
+            "command": "${workspaceFolder}\\bin\\myspice.exe",
+            "args": [
+                "-f",
+                "./benchmark/RLC_s3.sp",
+            ]
+        },
+
+        // help
         {
             "type": "process",
             "label": "myspice-help_message",

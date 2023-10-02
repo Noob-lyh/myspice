@@ -68,6 +68,7 @@ void Stamp::parse(char* filename)
 	_node_list["0"] = 0;
 	int node_index = 1;
 	int aux_node_index = 0;
+	int subckt_index = 0;
 
 	while(getline(ifid, line))
 	{
@@ -269,7 +270,36 @@ void Stamp::parse(char* filename)
 			// add to device list
 			_dev_list.push_back(r);
       	}
-      
+
+		else if(line[0] == 'X'){
+
+			// name
+			tmp = tokenizer(line, delims);
+			Subckt* r = new Subckt(tmp);
+			
+			// ports
+			string next;
+			tmp = tokenizer(line, delims);
+			next = tokenizer(line, delims);
+			while (!next.empty()){
+
+				if(_node_list.find(tmp) == _node_list.end())
+	  			{
+	    			_node_list[tmp] = node_index++;
+	  			}
+				r->addPort(_node_list[tmp]);
+				
+				tmp = next;
+				next = tokenizer(line, delims);
+			}
+
+			// subckt type (when next is empty)
+			r->setSubcktName(tmp);
+
+			// add to device list
+			_dev_list.push_back(r);
+		}
+
 	  	else {
 			
 			string token = tokenizer(line, delims);
@@ -293,6 +323,27 @@ void Stamp::parse(char* filename)
 	    			++_num_out;
 	    			token = tokenizer(line, delims);
 	  			}
+			}
+
+			// sub circuit
+			else if (token == ".SUBCKT") {
+				token = tokenizer(line, delims);
+				if (_subckt_list.find(token) != _subckt_list.end()) {
+					printf("redefine sub circuit!\n");
+					return;
+				} else {
+					_subckt_list[token] = subckt_index;		// sub circuit name
+
+					token = tokenizer(line, delims);
+					while (token.size() != 0) {
+
+					}
+
+					vector<Device*> tmp_subckt;
+
+
+					++subckt_index;
+				}
 			}
       	}
 
@@ -362,7 +413,7 @@ void Stamp::setup(){
 		for(out_index = 0; out_index < _X->size(); ++out_index)
 			if (*probe_name == (*(*_X)[out_index]))
 				break;
-		_LT->insert(i, out_index, 1);	 printf("%d %d\n", i, out_index);
+		_LT->insert(i, out_index, 1);	 //printf("%d %d\n", i, out_index);
 	}
 
 	// form all sparse matrixes

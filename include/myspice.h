@@ -143,6 +143,20 @@ private:
     string _ind2;
 };
 
+class Subckt: public Device{
+public:
+    Subckt(const string&);
+    virtual ~Subckt();
+    void addPort(int);
+    int getPort(int) const;
+    void setSubcktName(const string&);
+    string getSubcktName() const;
+    virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, vector<string*>&, vector<string*>&, vector<string*>&, int);
+private:
+    string _subckt_name;
+    vector<int> _port_list;
+};
+
 
 // stamp.cpp
 class Stamp{
@@ -156,8 +170,9 @@ private:
     // for parse
     int _num_in;
     int _num_out;
-    map<string, int> _node_list, _aux_node_list;    // -> vector X
+    map<string, int> _node_list, _aux_node_list, _subckt_list;    // -> vector X
     vector<Device*> _dev_list;
+    vector< vector <Device*> > _subckt_dev_list;
     vector<string*> *_Y;    // = _probe_list
     // for stamp
     Mat<REAL> *_C, *_G, *_B, *_LT;

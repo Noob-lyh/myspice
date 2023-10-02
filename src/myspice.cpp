@@ -35,6 +35,6 @@ int main(int argc, char** argv){
     }
 
 RET:
-    printf("return code = %d\n", myspice_stat);
+    // printf("return code = %d\n", myspice_stat);
     return myspice_stat;
 }

@@ -22,7 +22,7 @@ void Resistor::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B, Mat<REAL>& LT, ve
     G.insert(i, j, -1/_value);
     G.insert(j, i, -1/_value);
     G.insert(j, j, 1/_value);
-    cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
+    cout << '\t' << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
 }
 
 
@@ -36,7 +36,7 @@ void Capacitor::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B, Mat<REAL>& LT, v
     C.insert(i, j, -_value);
     C.insert(j, i, -_value);
     C.insert(j, j, _value);
-	cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
+	cout << '\t' << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
 }
 
 
@@ -54,7 +54,7 @@ void Inductor::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B, Mat<REAL>& LT, ve
     G.insert(j, k, -1);
     G.insert(k, i, -1);
     G.insert(k, j, 1);
-	cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
+	cout << '\t' << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
 }
 
 
@@ -74,7 +74,7 @@ void Mutual::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B, Mat<REAL>& LT, vect
     int j = _aux_node_neg + aux_offset - 1;
     C.insert(i, j, -_value);
     C.insert(j, i, -_value);
-    cout << _name << ' ' << _ind1 << ' ' << _ind2 << ' ' << _value << endl;
+    cout << '\t' << _name << ' ' << _ind1 << ' ' << _ind2 << ' ' << _value << endl;
 }
 
 
@@ -91,8 +91,8 @@ void Isrc::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B, Mat<REAL>& LT, vector
     int j = _nnode - 1;
     B.insert(i, _in_index, _value);     // _in_index is 0-based
     B.insert(j, _in_index, -_value);
-
-    cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
+    
+    cout << '\t' << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
 }
 
 
@@ -114,8 +114,31 @@ void Vsrc::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B, Mat<REAL>& LT, vector
     G.insert(j, k, -1);
     G.insert(k, i, -1);
     G.insert(k, j, 1);
-
     B.insert(k, _in_index, 1);
  
-    cout << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
+    cout << '\t' << _name << ' ' << _pnode << ' ' << _nnode << ' ' << _value << endl;
+}
+
+Subckt::Subckt(const string &name) : Device(name) {};
+Subckt::~Subckt() {};
+void Subckt::addPort(int p) {_port_list.push_back(p);}
+int Subckt::getPort(int index) const {
+    if (index >= _port_list.size()){
+        printf("invalid port index.\n");
+        return -1;
+    } else {
+        return _port_list[index];
+    }
+}
+void Subckt::setSubcktName(const string& subckt_name) {_subckt_name = subckt_name;}
+string Subckt::getSubcktName() const {return _subckt_name;}
+void Subckt::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B, Mat<REAL>& LT, vector<string*>& X, vector<string*>& Y, vector<string*>& U, int aux_offset)
+{
+
+    
+
+    cout << '\t' << _name << ' ';
+    for(int i = 0; i < _port_list.size(); ++i)
+        cout << _port_list[i] << ' ';
+    cout << _subckt_name.c_str() << '\n';
 }
