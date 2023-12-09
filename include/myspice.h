@@ -2,15 +2,21 @@
 #define __MYSPICE_H__
 
 #include<iostream>
+#include<fstream>
+#include<sstream>
 #include<vector>
 #include<map>
 #include<string>
 #include<string.h>
+#include<typeinfo>
 
+using std::ifstream;
+using std::ofstream;
+using std::endl;
+using std::getline;
 using std::vector;
 using std::map;
 using std::string;
-
 using std::cout;
 using std::endl;
 
@@ -24,6 +30,10 @@ using std::endl;
 #define MYSPICE_FILE_CANNOT_OPEN		(-2)
 #define MYSPICE_FILE_FORMAT_ERROR		(-3)
 #define MYSPICE_NO_INPUT_FILE			(-4)
+
+#define DELETE_AND_SET_NULL(ptr) if(ptr){delete ptr; ptr=NULL;}
+
+#define PRINT_INFO
 
 
 
@@ -143,18 +153,35 @@ private:
     string _ind2;
 };
 
-class Subckt: public Device{
+class Subckt: public Device{    // only ports and name
 public:
     Subckt(const string&);
     virtual ~Subckt();
-    void addPort(int);
-    int getPort(int) const;
     void setSubcktName(const string&);
     string getSubcktName() const;
+    void addPort(int);
+    int getPort(int) const;
     virtual void stamp(Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, Mat<REAL>&, vector<string*>&, vector<string*>&, vector<string*>&, int);
 private:
     string _subckt_name;
     vector<int> _port_list;
+};
+
+
+class SubcktDef {
+public:
+    SubcktDef(const string&);
+    ~SubcktDef();
+    void addPortName(const string&);
+    string getPortName(int) const;
+    int getSize(map<string, int>&, vector<SubcktDef*>&);
+    friend class Stamp;
+private:
+    string _name;
+    int _size;
+    vector<string*> _port_list;
+    map<string, int> _node_list, _aux_node_list;
+    vector<Device*> _dev_list;
 };
 
 
@@ -167,16 +194,22 @@ public:
     void output(const char*);
     void setup();
 private:
-    // for parse
+    // main circuit
     int _num_in;
     int _num_out;
-    map<string, int> _node_list, _aux_node_list, _subckt_list;    // -> vector X
+    map<string, int> _node_list, _aux_node_list;
     vector<Device*> _dev_list;
-    vector< vector <Device*> > _subckt_dev_list;
-    vector<string*> *_Y;    // = _probe_list
-    // for stamp
+    map<string, int> _subckt_list;
+    // sub circuit
+    vector<SubcktDef*> _subckt_def_list;
+    // matrix & vector
     Mat<REAL> *_C, *_G, *_B, *_LT;
-    vector<string*> *_X, *_U;
+    vector<string*> *_X, *_Y, *_U;
+    
+    int parse_line(ifstream& ifid, string& line, int& num_in, int& num_out,
+            int& node_index, int& aux_node_index, int& subckt_index, 
+            map<string, int>& node_list, map<string, int>& aux_node_list, 
+            map<string, int>& subckt_list, vector<Device*>& dev_list);
 };
 
 

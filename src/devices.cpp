@@ -142,3 +142,34 @@ void Subckt::stamp(Mat<REAL>& C, Mat<REAL>& G, Mat<REAL>& B, Mat<REAL>& LT, vect
         cout << _port_list[i] << ' ';
     cout << _subckt_name.c_str() << '\n';
 }
+
+
+SubcktDef::SubcktDef(const string& name) : _size(-1) {_name = name;};
+SubcktDef::~SubcktDef() {};
+void SubcktDef::addPortName(const string& portname) {
+    _port_list.push_back(new string(portname));
+};
+string SubcktDef::getPortName(int index) const {
+    if (index >= _port_list.size()){
+        printf("invalid port index.\n");
+        return string();
+    } else {
+        return *(_port_list[index]);
+    }
+};
+int SubcktDef::getSize(map<string, int>& _subckt_list, vector<SubcktDef*>& _subckt_def_list) {  // call it after all subckt are read
+    if (_size == -1) {
+        int tmp = 0;
+        for (int i = 0; i < _dev_list.size(); ++i){
+            Subckt *dev = dynamic_cast<Subckt*>(_dev_list[i]);
+            if (dev != nullptr){
+                string name = dev->getSubcktName();
+                tmp += _subckt_def_list[_subckt_list[name]]->getSize(_subckt_list, _subckt_def_list);
+            } else {
+                ++tmp;
+            };
+        }
+        _size = tmp;
+    }
+    return _size;
+};

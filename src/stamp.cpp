@@ -9,15 +9,6 @@
 ///
 
 #include "myspice.h"
-#include <fstream>
-#include <sstream>
-
-using std::ifstream;
-using std::ofstream;
-using std::endl;
-using std::getline;
-
-#define DELETE_AND_SET_NULL(ptr) if(ptr){delete ptr; ptr=NULL;}
 
 
 /// \brief Constructor 
@@ -42,6 +33,266 @@ Stamp::~Stamp(){
 }
 
 
+int Stamp::parse_line(ifstream& ifid, string& line, int& num_in, int& num_out, 
+            int& node_index, int& aux_node_index, int& subckt_index, 
+            map<string, int>& node_list, map<string, int>& aux_node_list, 
+			map<string, int>& subckt_list, vector<Device*>& dev_list){
+
+	string tmp;
+	string delims(" \n\r()\t");
+
+	if(line[0] == 'R'){
+		// name
+		tmp = tokenizer(line, delims);
+		Resistor *r = new Resistor(tmp);
+		// pnode
+		tmp = tokenizer(line, delims);
+		if(node_list.find(tmp) == node_list.end())
+	    	node_list[tmp] = node_index++;
+		r->setPnode(node_list[tmp]);
+		// nnode
+		tmp = tokenizer(line, delims);
+		if(node_list.find(tmp) == node_list.end())
+	    	node_list[tmp] = node_index++;
+		r->setNnode(node_list[tmp]);
+		// value
+		tmp = tokenizer(line, delims);
+		r->setValue(to_double(tmp));
+		// add to device list
+		dev_list.push_back(r);
+		return 1;
+
+    } else if(line[0] == 'C'){
+		// name
+		tmp = tokenizer(line, delims);
+		Capacitor* r = new Capacitor(tmp);
+		// pnode
+		tmp = tokenizer(line, delims);
+		if(node_list.find(tmp) == node_list.end())
+	    	node_list[tmp] = node_index++;
+		r->setPnode(node_list[tmp]);
+		// nnode
+		tmp = tokenizer(line, delims);
+		if(node_list.find(tmp) == node_list.end())
+	    	node_list[tmp] = node_index++;
+		r->setNnode(node_list[tmp]);
+		// value
+		tmp = tokenizer(line, delims);
+		r->setValue(to_double(tmp));
+		// add to device list
+		dev_list.push_back(r);
+		return 2;
+
+    } else if(line[0] == 'L'){
+		// name
+		tmp = tokenizer(line, delims);
+		Inductor* r = new Inductor(tmp);
+		// aux current
+		tmp = "i:"+tmp;
+		if(aux_node_list.find(tmp) == aux_node_list.end())
+	    	aux_node_list[tmp] = aux_node_index++;
+		r->setAux(aux_node_list[tmp]);
+		// pnode
+		tmp = tokenizer(line, delims);
+		if(node_list.find(tmp) == node_list.end())
+	    	node_list[tmp] = node_index++;
+		r->setPnode(node_list[tmp]);
+		// nnode
+		tmp = tokenizer(line, delims);
+		if(node_list.find(tmp) == node_list.end())
+	    	node_list[tmp] = node_index++;
+		r->setNnode(node_list[tmp]);
+		// value
+		tmp = tokenizer(line, delims);
+		r->setValue(to_double(tmp));
+		// add to device list
+		dev_list.push_back(r);
+		return 3;
+    
+	} else if(line[0] == 'I'){
+		// name
+		tmp = tokenizer(line, delims);
+		Isrc* r = new Isrc(tmp);
+		// pnode
+		tmp = tokenizer(line, delims);
+		if(node_list.find(tmp) == node_list.end())
+	   		node_list[tmp] = node_index++;
+		r->setPnode(node_list[tmp]);
+		// nnode
+		tmp = tokenizer(line, delims);
+		if(node_list.find(tmp) == node_list.end())
+	    	node_list[tmp] = node_index++;
+		r->setNnode(node_list[tmp]);
+		// value
+		tmp = tokenizer(line, delims);
+		r->setValue(to_double(tmp));
+		// add to num_in
+		r->setIn(num_in++);
+		// add to device list
+		dev_list.push_back(r);
+		return 4;
+      	
+	} else if(line[0] == 'V'){
+		// name
+		tmp = tokenizer(line, delims);
+		Vsrc* r = new Vsrc(tmp);
+		// aux current
+		tmp = "i:"+tmp;
+		if(aux_node_list.find(tmp) == aux_node_list.end())
+	    	aux_node_list[tmp] = aux_node_index++;
+		r->setAux(aux_node_list[tmp]);
+		// pnode
+		tmp = tokenizer(line, delims);
+		if(node_list.find(tmp) == node_list.end())
+	    	node_list[tmp] = node_index++;
+		r->setPnode(node_list[tmp]);
+		// nnode
+		tmp = tokenizer(line, delims);
+		if(node_list.find(tmp) == node_list.end())
+	    	node_list[tmp] = node_index++;
+		r->setNnode(node_list[tmp]);	
+		// value
+		tmp = tokenizer(line, delims);
+		r->setValue(to_double(tmp));
+		// add to num_in
+		r->setIn(num_in++);
+		// add to device list
+		dev_list.push_back(r);
+		return 5;
+
+    } else if(line[0] == 'K'){
+		// name
+		tmp = tokenizer(line, delims);
+		Mutual* r = new Mutual(tmp);
+		// pnode & auxpos
+		tmp = tokenizer(line, delims);
+		r->setInd1(tmp);
+		r->setAuxPos(aux_node_list[tmp]);
+		// nnode & auxneg
+		tmp = tokenizer(line, delims);
+		r->setInd2(tmp);
+		r->setAuxNeg(aux_node_list[tmp]);
+		// value
+		tmp = tokenizer(line, delims);
+		r->setValue(to_double(tmp));
+		// add to device list
+		dev_list.push_back(r);
+		return 6;
+    
+	} else if(line[0] == 'X'){	// only ports and subckt name
+		// name
+		tmp = tokenizer(line, delims);
+		Subckt* r = new Subckt(tmp);
+		// ports
+		string next;
+		tmp = tokenizer(line, delims);
+		next = tokenizer(line, delims);
+		while (!next.empty()){
+			if(node_list.find(tmp) == node_list.end())
+	    		node_list[tmp] = node_index++;
+			r->addPort(node_list[tmp]);
+			// next two tokens
+			tmp = next;
+			next = tokenizer(line, delims);
+		}
+		// subckt type (when next is empty)
+		r->setSubcktName(tmp);
+		// add to device list
+		dev_list.push_back(r);
+		return 7;
+	
+	} else {	// line[0] == '.' or others		
+		string token = tokenizer(line, delims);
+
+		// netlist file or subckt ends
+		if (token == ".END" || token == ".ENDS") {
+#ifdef PRINT_INFO				
+printf("READ_END, return -1.\n");
+#endif
+	  		return -1;
+		}
+
+		// note or blank
+		else if (token == "*" || token == ""){
+			return 0;
+		}
+	
+		// specify output node
+		else if (token == ".PROBE" /*|| token == ".PRINT"*/) {
+	  		token = tokenizer(line, delims);
+	  		while(!token.empty()){
+	    		if(token == "V"){
+					token = tokenizer(line, delims);
+					continue;
+	      		}
+				string *tmp = new string(token);
+	    		(*_Y).push_back(tmp);
+	    		++_num_out;	// only in main circuit
+	    		token = tokenizer(line, delims);
+	  		}
+			return 0;
+		}
+
+		// sub circuit definition, always operate global list
+		else if (token == ".SUBCKT") {
+
+			token = tokenizer(line, delims);	// subckt name
+
+			if (_subckt_list.find(token) != _subckt_list.end()) {
+				printf("redefine sub circuit!\n");
+				return -1;
+
+			} else {
+
+				string name = token;	
+#ifdef PRINT_INFO				
+printf("DEF_SUB : %s\n", name.c_str());
+#endif
+				_subckt_list[name] = subckt_index;	// add to map
+
+				SubcktDef *tmp = new SubcktDef(name);				
+				
+				// read subckt ports
+				token = tokenizer(line, delims);
+				while (token.size() != 0) {	
+					tmp->addPortName(token);
+#ifdef PRINT_INFO
+printf("ADD_PORT : %s\n", token.c_str());
+#endif
+					token = tokenizer(line, delims);
+				}
+ 				
+				// read dev in subckt until ".ENDS name" 
+				int sub_node_index = 1;
+				int sub_aux_node_index = 0;
+				int idum = 0;	// unused
+				map<string, int> ldum;	// unused
+
+				while(getline(ifid, line)) {
+					capitalize(line);
+#ifdef PRINT_INFO
+printf("READ_SUB : %s\n", line.c_str());
+#endif
+					if (parse_line(ifid, line, idum, idum,
+							sub_node_index, sub_aux_node_index, idum, 
+							tmp->_node_list, tmp->_aux_node_list, ldum, tmp->_dev_list) == -1)
+						break;
+    			}
+		
+				_subckt_def_list.push_back(tmp);	// add to subcircuit define list
+
+				++subckt_index;	
+			}
+			return 8;
+
+		// others
+		} else {
+			printf("Invalid netlist or unsupported device.\n");
+			return -1;
+		}
+	}
+}
+
 /// \brief Parsing the SPICE netlist
 ///
 /// @param filename SPICE filename
@@ -63,291 +314,31 @@ void Stamp::parse(char* filename)
 	_num_in = 0;
 	_num_out = 0;
 	
-	string line;
-	string delims(" \n\r()\t");
+	string line; 
 	_node_list["0"] = 0;
 	int node_index = 1;
 	int aux_node_index = 0;
 	int subckt_index = 0;
 
+	getline(ifid, line);
 	while(getline(ifid, line))
-	{
-		string tmp;
+	{	
 		capitalize(line);
+#ifdef PRINT_INFO
+printf("READ_MAIN : %s\n", line.c_str());
+#endif
+		if (parse_line(ifid, line, _num_in, _num_out,
+			node_index, aux_node_index, subckt_index,
+			_node_list, _aux_node_list, _subckt_list, _dev_list) == -1)
+			break;
+    }
 
-		if(line[0] == 'R'){
-
-			// name
-			tmp = tokenizer(line, delims);
-			Resistor *r = new Resistor(tmp);
-
-			// pnode
-			tmp = tokenizer(line, delims);
-			if(_node_list.find(tmp) == _node_list.end())
-	  		{
-	    		_node_list[tmp] = node_index++;
-	  		}
-			r->setPnode(_node_list[tmp]);
-
-			// nnode
-			tmp = tokenizer(line, delims);
-			if(_node_list.find(tmp) == _node_list.end())
-	  		{
-	    		_node_list[tmp] = node_index++;
-	  		}
-			r->setNnode(_node_list[tmp]);
-
-			// value
-			tmp = tokenizer(line, delims);
-			r->setValue(to_double(tmp));
-
-			// add to device list
-			_dev_list.push_back(r);
-      	}
-      
-	  	else if(line[0] == 'C'){
-			
-			// name
-			tmp = tokenizer(line, delims);
-			Capacitor* r = new Capacitor(tmp);
-
-			// pnode
-			tmp = tokenizer(line, delims);
-			if(_node_list.find(tmp) == _node_list.end())
-	  		{
-	    		_node_list[tmp] = node_index++;
-	  		}
-			r->setPnode(_node_list[tmp]);
-
-			// nnode
-			tmp = tokenizer(line, delims);
-			if(_node_list.find(tmp) == _node_list.end())
-	  		{
-	    		_node_list[tmp] = node_index++;
-	  		}
-			r->setNnode(_node_list[tmp]);
-
-			// value
-			tmp = tokenizer(line, delims);
-			r->setValue(to_double(tmp));
-
-			// add to device list
-			_dev_list.push_back(r);
-      	}
-  
-		else if(line[0] == 'L'){
-	
-			// name
-			tmp = tokenizer(line, delims);
-			Inductor* r = new Inductor(tmp);
-			
-			// aux current
-			tmp = "i:"+tmp;
-			if(_aux_node_list.find(tmp) == _aux_node_list.end())
-	  		{
-	    		_aux_node_list[tmp] = aux_node_index++;
-	  		}
-			r->setAux(_aux_node_list[tmp]);
-
-			// pnode
-			tmp = tokenizer(line, delims);
-			if(_node_list.find(tmp) == _node_list.end())
-	  		{
-	    		_node_list[tmp] = node_index++;
-	  		}
-			r->setPnode(_node_list[tmp]);
-
-			// nnode
-			tmp = tokenizer(line, delims);
-			if(_node_list.find(tmp) == _node_list.end())
-	  		{
-	    		_node_list[tmp] = node_index++;
-	  		}
-			r->setNnode(_node_list[tmp]);
-			
-			// value
-			tmp = tokenizer(line, delims);
-			r->setValue(to_double(tmp));
-
-			// add to device list
-			_dev_list.push_back(r);
-      	}
-      
-		else if(line[0] == 'I'){
-			
-			// name
-			tmp = tokenizer(line, delims);
-			Isrc* r = new Isrc(tmp);
-
-			// pnode
-			tmp = tokenizer(line, delims);
-			if(_node_list.find(tmp) == _node_list.end())
-	  		{
-	   			_node_list[tmp] = node_index++;
-	  		}
-			r->setPnode(_node_list[tmp]);
-
-			// nnode
-			tmp = tokenizer(line, delims);
-			if(_node_list.find(tmp) == _node_list.end())
-	  		{
-	    		_node_list[tmp] = node_index++;
-	  		}
-			r->setNnode(_node_list[tmp]);
-
-			// value
-			tmp = tokenizer(line, delims);
-			r->setValue(to_double(tmp));
-
-			// add to num_in
-			r->setIn(_num_in++);
-
-			// add to device list
-			_dev_list.push_back(r);
-      	}
-
-      	else if(line[0] == 'V'){
-			
-			// name
-			tmp = tokenizer(line, delims);
-			Vsrc* r = new Vsrc(tmp);
-			
-			// aux current
-			tmp = "i:"+tmp;
-			if(_aux_node_list.find(tmp) == _aux_node_list.end())
-	  		{
-	    		_aux_node_list[tmp] = aux_node_index++;
-	  		}
-			r->setAux(_aux_node_list[tmp]);
-
-			// pnode
-			tmp = tokenizer(line, delims);
-			if(_node_list.find(tmp) == _node_list.end())
-	  		{
-	    		_node_list[tmp] = node_index++;
-	  		}
-			r->setPnode(_node_list[tmp]);
-
-			// nnode
-			tmp = tokenizer(line, delims);
-			if(_node_list.find(tmp) == _node_list.end())
-	  		{
-	    		_node_list[tmp] = node_index++;
-	  		}
-			r->setNnode(_node_list[tmp]);
-			
-			// value
-			tmp = tokenizer(line, delims);
-			r->setValue(to_double(tmp));
-
-			// add to num_in
-			r->setIn(_num_in++);
-
-			// add to device list
-			_dev_list.push_back(r);
-      	}
-    
-		else if(line[0] == 'K'){
-			
-			// name
-			tmp = tokenizer(line, delims);
-			Mutual* r = new Mutual(tmp);
-			
-			// pnode & auxpos
-			tmp = tokenizer(line, delims);
-			r->setInd1(tmp);
-			r->setAuxPos(_aux_node_list[tmp]);
-
-			// nnode & auxneg
-			tmp = tokenizer(line, delims);
-			r->setInd2(tmp);
-			r->setAuxNeg(_aux_node_list[tmp]);
-			
-			// value
-			tmp = tokenizer(line, delims);
-			r->setValue(to_double(tmp));
-
-			// add to device list
-			_dev_list.push_back(r);
-      	}
-
-		else if(line[0] == 'X'){
-
-			// name
-			tmp = tokenizer(line, delims);
-			Subckt* r = new Subckt(tmp);
-			
-			// ports
-			string next;
-			tmp = tokenizer(line, delims);
-			next = tokenizer(line, delims);
-			while (!next.empty()){
-
-				if(_node_list.find(tmp) == _node_list.end())
-	  			{
-	    			_node_list[tmp] = node_index++;
-	  			}
-				r->addPort(_node_list[tmp]);
-				
-				tmp = next;
-				next = tokenizer(line, delims);
-			}
-
-			// subckt type (when next is empty)
-			r->setSubcktName(tmp);
-
-			// add to device list
-			_dev_list.push_back(r);
-		}
-
-	  	else {
-			
-			string token = tokenizer(line, delims);
-	
-			// netlist file ends
-			if (token == ".END") {
-	  			return;
-			}
-	
-			// specify output node
-			else if (token == ".PROBE" /*|| token == ".PRINT"*/) {
-	  			token = tokenizer(line, delims);
-	  			while(!token.empty()){
-	    			if(token == "V")
-	      			{
-						token = tokenizer(line, delims);
-						continue;
-	      			}
-					string *tmp = new string(token);
-	    			(*_Y).push_back(tmp);
-	    			++_num_out;
-	    			token = tokenizer(line, delims);
-	  			}
-			}
-
-			// sub circuit
-			else if (token == ".SUBCKT") {
-				token = tokenizer(line, delims);
-				if (_subckt_list.find(token) != _subckt_list.end()) {
-					printf("redefine sub circuit!\n");
-					return;
-				} else {
-					_subckt_list[token] = subckt_index;		// sub circuit name
-
-					token = tokenizer(line, delims);
-					while (token.size() != 0) {
-
-					}
-
-					vector<Device*> tmp_subckt;
-
-
-					++subckt_index;
-				}
-			}
-      	}
-
-    } // end while
+	for (vector<SubcktDef*>::iterator it = _subckt_def_list.begin(); it != _subckt_def_list.end(); ++it){
+		(*it)->getSize(_subckt_list, _subckt_def_list);
+#ifdef PRINT_INFO
+printf("SUBCKT : %s, size = %d\n", (*it)->_name.c_str(), (*it)->getSize(_subckt_list, _subckt_def_list));
+#endif
+	}
 
   	ifid.close();
 }

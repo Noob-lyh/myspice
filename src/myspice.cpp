@@ -34,6 +34,8 @@ int main(int argc, char** argv){
         s.output(output_file.c_str());
     }
 
+    return MYSPICE_SUCCESS;
+
 RET:
     // printf("return code = %d\n", myspice_stat);
     return myspice_stat;
