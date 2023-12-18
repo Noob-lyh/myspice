@@ -1,0 +1,20 @@
+* "simulator" "HSPICE" 
+* "version" "D-2010.03-SP1 32-BIT"
+* "format" "HSP"
+* "rundate" "19:07:08 12/15/2007 "
+* "netlist" "d:\课本&课件&文件\研究生课程\现代集成电路设计方法\【现代集成电路分析】作业资料\project3-5\benchmark\rlc_s3_pulse.sp "
+* "runtitle" "* example rlc-3"
+* time =    0.            
+* temperature =   25.0000        
+*** BEGIN: Saved Operating Point ***                     
+.option 
++ gmindc=   1.0000p       
+.nodeset
++ n_in1 =   0.            
++ n_in2 =   0.            
++ n_in3 =   0.            
++ n_out =   0.            
++ x1.n_1 =   0.            
++ x2.n_1 =   0.            
++ x3.n_1 =   0.            
+***   END: Saved Operating Point ***                     
