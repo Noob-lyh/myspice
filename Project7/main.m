@@ -2,88 +2,96 @@ clear;
 clc;
 close all;
 
-
+% read file
 cd ./Benchmark
 FILE = 1;
 if(FILE == 1)
     stamp RLC_s3.sp
-    %output_hspice = read_data('rlc_s3_pulse.lis');
-    T = 0.02;
+    output_hspice = read_data('RLC_s3.lis');
+    T = 0.02; 
+    dt = 0.000004;
+    circle = 0.005;
 end
 if(FILE == 2)
     stamp bus8bit8seg.sp
-    %output_hspice = read_data('bus8bit8seg_pulse.lis');
-    T = 1E-9;
+    output_hspice = read_data('bus8bit8seg.lis');
+    T = 1e-9;
+    dt = 1e-12;
+    circle = 5e-11;
 end
 if(FILE == 3)
     stamp bus32seg16.sp
-    %output_hspice = read_data('bus32seg16_pulse.lis');
-    T = 1E-9;
+    output_hspice = read_data('bus32seg16.lis');
+    T = 0.02; 
+    dt = 0.000004;
+    circle = 0.005;
 end
-steps = 100;
-interval = T/steps;
 cd ..
 
-T_start = 0;
-T_end = 1e-7;
-dt = 1e-9;
-%T_end = hspice_data(size(hspice_data,1),1);
-%dt = hspice_data(2,1) - hspice_data(1,1);
-N = floor( (T_end-T_start)/dt ) + 1;
-
-%cycle: the cycle number of the waveform
-%error_limited: the limited error to stop iteration
-%iter_max: the maximum steps of Newton_method to stop iteration
-cycle = 5;
+% settings
+n = size(G, 1);
+N = round(T/dt);
 error_limited = 1e-9;
 iter_max = 50;
 
+% get src values
+for i = 1 : length(SRC) % can't read in phase?
+    SRC{i,1}{5,1} = 0;
+    SRC{i,1}{6,1} = 0;
+    SRC{i,1}{7,1} = 90; % cos(200*pi*t) or cos(20G*pi*t)
+end
+SRC_Value = getsrcv(SRC, dt*(1:N));
+
 %begin to iterate
 tic;
-[ X_T, Xerror, Herror, index ] = newton( C, G, B, LT, SRC, T_start, T_end / cycle, floor(N / cycle), error_limited, iter_max );
-[results, src_value, ~] = BE(C, G, B, LT, SRC, T_start, T_end, N, X_T);
+L = round(circle/dt);
+M = C + dt * G;
+J = (M\C)^L - eye(n);
+x = zeros(n, N+1);  % x_it
+Xerror = inf;
+Herror = inf;
+iter = 0;
+% calculate inital value for steady solution
+while (Xerror > error_limited || Herror > error_limited) && iter < iter_max
+    for i = 1 : L   % x_it(0) + BE iteration -> x_it(T)
+        b = C * x(:, i) + dt * B * SRC_Value(:,i); 
+        x(:,i + 1) = M \ b;
+    end   
+    H = x(:, L+1) - x(:, 1);
+    Herror = norm(H);               % x_it(T) - x_it(0)
+    x_diff = J\H;
+    Xerror = norm(x_diff);          % x_it+1(0) - x_it(0)
+    x(:, 1) = x(:, 1) - x_diff;
+    iter = iter + 1;
+end
+% calculate steady solution
+output_shooting = zeros(N+1, size(LT,1)+1);    
+for i = 1 : N
+    b = C * x(:, i) + dt * B * SRC_Value(:,i); 
+    x(:,i + 1) = M \ b;
+    output_shooting(i+1, :) = [i*dt, (LT*x(:,i + 1))'];
+end
+% calculate error
+error = output_hspice(2:end, 2) - output_shooting(2:end, 2);
+MSE = sum(error.^2)/length(error);
 toc;
 
-%compute the error
-% [error , max_error ,MSE] = calc_error(hspice_data,results);
+% ploting
+subplot(3,1,1);
+plot((0:N-1)*dt, SRC_Value);
+xlabel('t / s');
+ylabel('Vin / V');
 
-%store data
-% result_file = strcat(result_filename,'.mat');
-% save( result_file, 'hspice_data','results','src_value','N','error','max_error','MSE','index','X_T','Xerror','Herror','-mat');
+subplot(3,1,2);
+plot((1:N)*dt, output_shooting(2:end, 2), 'r');
+hold on;
+plot((1:N)*dt, output_hspice(2:end, 2), 'g');
+xlabel('t / s');
+ylabel('Vout_1(shooting-hspice) / V)');
 
-%display the figures and print results
-% load(result_file,'-mat');
-% disp(result_file);
-fprintf('Initial value = %lf\n', X_T);
-fprintf('Iteration number of Newton = %d\n', index);
-fprintf('Error of X = %lf\n', Xerror);
-fprintf('Error of H = %lf\n', Herror);
-% fprintf('Maximum error (absolute) = %lf\n', max_error);
-% fprintf('MSE = %lf\n', MSE);
+subplot(3,1,3);
+plot((1:N)*dt, error);
+xlabel('t / s');
+ylabel('Verror_1 / V');
 
-% subplot(2,2,1);
-% plot(results(:,1),src_value(:,:),'b');
-% title('Fig.1: input signal waveform','FontSize',14);
-% xlabel('t(s)','FontSize',14);
-% ylabel('Voltage(V)','FontSize',14);
-% 
-% subplot(2,2,2);
-% plot(results(:,1),results(:,2),'r');
-% title('Fig.2: output of Back Euler simuation','FontSize',14);
-% xlabel('t(s)','FontSize',14);
-% ylabel('Voltage(V)','FontSize',14);
-% 
-% subplot(2,2,3);
-% plot(results(:,1),results(:,2),'b--');
-% hold on;
-% plot(hspice_data(:,1),hspice_data(:,2),'r');
-% title('Fig.3: comparison between simulation and spice result','FontSize',14);
-% xlabel('t(s)','FontSize',14);
-% ylabel('Voltage(V)','FontSize',14);
-% legend('Back Euler simuation','hspice result');
-% 
-% subplot(2,2,4);
-% plot(error(:,1),error(:,2),'c');
-% title('Fig.4: absolute error distribution','FontSize',14);
-% xlabel('t(s)','FontSize',14);
-% ylabel('Voltage(V)','FontSize',14);
+fprintf('MSE of output 1 is: %f\n', MSE);

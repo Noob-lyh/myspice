@@ -1,7 +1,7 @@
 * Example RLC-3
 
 *Vin N_in1  	0 PULSE 0 3 1m 1m  1m	8m	20m
-Vin N_in1  	0 sin(0 3 0.2k)
+Vin N_in1  	0 sin(0 3 0.2k 0 0 90)
 
 *Vin N_in1  	0 10
 

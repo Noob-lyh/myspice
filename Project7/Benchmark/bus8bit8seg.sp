@@ -9,7 +9,8 @@ Rin6 0 TDn6a1 10
 Rin7 0 TDn7a1 10
 Rin8 0 TDn8a1 10
 *Iin1 TDn1a1 0 AC 1
-Iin1 TDn1a1 0 PULSE(0 1 0.05ns 0.05ns 0.05ns 0.30ns 0.50ns)
+*Iin1 TDn1a1 0 PULSE(0 1 0.05ns 0.05ns 0.05ns 0.30ns 0.50ns)
+Iin1 TDn1a1 0 sin(0 3 20000000000 0 0 90)
 
 Rgndg TDnga1 0 1
 Rvndg TDnva1 0 1

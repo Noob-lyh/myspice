@@ -28,9 +28,8 @@ R2 = 80e3;
 
 
 % symbolic valuables
-syms Vout1 Vout2 Vss;   % Vss = Vp
+syms Vout1 Vout2 Vss Vin2_s;   % Vin1 is fixed, Vss = Vp
 Vout_s = [Vout1; Vout2; Vss];
-syms Vin2_s;
 
 % KCL at p, output1 and output2
 f1 = Iss - (Vdd-Vout1) / R1 - (Vdd-Vout2) / R2; 
@@ -38,7 +37,7 @@ f2 = (Vdd-Vout1) / R1 - 0.5 * un * Coxn * Wn/Ln * (Vin1  -Vss-Vthn)^2 * (1 + lam
 f3 = (Vdd-Vout2) / R2 - 0.5 * un * Coxn * Wn/Ln * (Vin2_s-Vss-Vthn)^2 * (1 + lamdan * (Vout2-Vss));
 
 % F and J in symbolic form
-f = [f1; f2; f3];   % f = I(Vout1, Vout2, Vss) = 0
+f = [f1; f2; f3];   % f = I(Vout1, Vout2, Vss) = I(Vout_s)= 0
 j = jacobian(f, Vout_s); 
 
 

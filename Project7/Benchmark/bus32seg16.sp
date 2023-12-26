@@ -33,14 +33,14 @@ Rin30 0 TDn30a1 10
 Rin31 0 TDn31a1 10
 Rin32 0 TDn32a1 10
 *Iin1 TDn1a1 0 AC 1
-Iin1 TDn1a1 0 PULSE(0 1 0.05ns 0.05ns 0.05ns 0.30ns 0.50ns)
-Iin2 TDn2a1 0 PULSE(0 1 0.05ns 0.05ns 0.05ns 0.30ns 0.50ns)
-Iin3 TDn3a1 0 PULSE(0 1 0.05ns 0.05ns 0.05ns 0.30ns 0.50ns)
-Iin4 TDn4a1 0 PULSE(0 1 0.05ns 0.05ns 0.05ns 0.30ns 0.50ns)
-Iin5 TDn5a1 0 PULSE(0 1 0.05ns 0.05ns 0.05ns 0.30ns 0.50ns)
-Iin6 TDn6a1 0 PULSE(0 1 0.05ns 0.05ns 0.05ns 0.30ns 0.50ns)
-Iin7 TDn7a1 0 PULSE(0 1 0.05ns 0.05ns 0.05ns 0.30ns 0.50ns)
-Iin8 TDn8a1 0 PULSE(0 1 0.05ns 0.05ns 0.05ns 0.30ns 0.50ns)
+Iin1 TDn1a1 0 sin(0 3 0.2k 0 0 90)
+Iin2 TDn2a1 0 sin(0 3 0.2k 0 0 90)
+Iin3 TDn3a1 0 sin(0 3 0.2k 0 0 90)
+Iin4 TDn4a1 0 sin(0 3 0.2k 0 0 90)
+Iin5 TDn5a1 0 sin(0 3 0.2k 0 0 90)
+Iin6 TDn6a1 0 sin(0 3 0.2k 0 0 90)
+Iin7 TDn7a1 0 sin(0 3 0.2k 0 0 90)
+Iin8 TDn8a1 0 sin(0 3 0.2k 0 0 90)
 
 Rgndg TDnga1 0 1
 Rvndg TDnva1 0 1
@@ -19686,7 +19686,7 @@ Cn32anva17 TDn32a33 TDnva33 1.690880e-014
 *.output v<cout1>
 *.op 
 *.AC LIN 1000 0 10G 
-.Tran 1e-12 1e-9 
+.Tran 0.004m 20m 
 .probe  V(TDn1a9)  V(TDn2a9)  V(TDn3a9)  V(TDn4a9)  V(TDn5a9)  V(TDn6a9)  V(TDn7a9)  V(TDn8a9)  V(TDn9a9)  V(TDn10a9)  V(TDn11a9)  V(TDn12a9)  V(TDn13a9)  V(TDn14a9)  V(TDn15a9)  V(TDn16a9)  V(TDn17a9)  V(TDn18a9)  V(TDn19a9)  V(TDn20a9)  V(TDn21a9)  V(TDn22a9)  V(TDn23a9)  V(TDn24a9)  V(TDn25a9)  V(TDn26a9)  V(TDn27a9)  V(TDn28a9)  V(TDn29a9)  V(TDn30a9)  V(TDn31a9)  V(TDn32a9)  V(TDn32a1)  V(TDn31a1)  V(TDn30a1)  V(TDn29a1)  V(TDn28a1)  V(TDn27a1)  V(TDn26a1)  V(TDn25a1)  V(TDn24a1)  V(TDn23a1)  V(TDn22a1)  V(TDn21a1)  V(TDn20a1)  V(TDn19a1)  V(TDn18a1)  V(TDn17a1)  V(TDn16a1)  V(TDn15a1)  V(TDn14a1)  V(TDn13a1)  V(TDn12a1)  V(TDn11a1)  V(TDn10a1)  V(TDn9a1)  V(TDn8a1)  V(TDn7a1)  V(TDn6a1)  V(TDn5a1)  V(TDn4a1)  V(TDn3a1)  V(TDn2a1)  V(TDn1a1) 
 .print  V(TDn1a9)  V(TDn2a9)  V(TDn3a9)  V(TDn4a9)  V(TDn5a9)  V(TDn6a9)  V(TDn7a9)  V(TDn8a9)  V(TDn9a9)  V(TDn10a9)  V(TDn11a9)  V(TDn12a9)  V(TDn13a9)  V(TDn14a9)  V(TDn15a9)  V(TDn16a9)  V(TDn17a9)  V(TDn18a9)  V(TDn19a9)  V(TDn20a9)  V(TDn21a9)  V(TDn22a9)  V(TDn23a9)  V(TDn24a9)  V(TDn25a9)  V(TDn26a9)  V(TDn27a9)  V(TDn28a9)  V(TDn29a9)  V(TDn30a9)  V(TDn31a9)  V(TDn32a9)  V(TDn32a1)  V(TDn31a1)  V(TDn30a1)  V(TDn29a1)  V(TDn28a1)  V(TDn27a1)  V(TDn26a1)  V(TDn25a1)  V(TDn24a1)  V(TDn23a1)  V(TDn22a1)  V(TDn21a1)  V(TDn20a1)  V(TDn19a1)  V(TDn18a1)  V(TDn17a1)  V(TDn16a1)  V(TDn15a1)  V(TDn14a1)  V(TDn13a1)  V(TDn12a1)  V(TDn11a1)  V(TDn10a1)  V(TDn9a1)  V(TDn8a1)  V(TDn7a1)  V(TDn6a1)  V(TDn5a1)  V(TDn4a1)  V(TDn3a1)  V(TDn2a1)  V(TDn1a1) 
 .end
